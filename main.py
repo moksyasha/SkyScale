@@ -1,10 +1,13 @@
 import torch
 from utils import *
 from PIL import Image, ImageDraw, ImageFont
+import time
+import warnings
+
+warnings.filterwarnings("ignore")
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
-
 
 # Model checkpoints
 srgan_checkpoint = "./checkpoint_srgan.pth.tar"
@@ -20,30 +23,22 @@ srgan_generator.eval()
 #3 686 400 = 2560 * 1440 2k
 #8 294 400 = 3840 * 2160 4k
 
-def visualize_sr(img, halve=False):
+def visualize_sr(img):
     """
     Visualizes the super-resolved images from the SRResNet and SRGAN for comparison with the bicubic-upsampled image
     and the original high-resolution (HR) image, as done in the paper.
 
     :param img: filepath of the HR iamge
-    :param halve: halve each dimension of the HR image to make sure it's not greater than the dimensions of your screen?
-                  For instance, for a 2160p HR image, the LR image will be of 540p (1080p/4) resolution. On a 1080p screen,
-                  you will therefore be looking at a comparison between a 540p LR image and a 1080p SR/HR image because
-                  your 1080p screen can only display the 2160p SR/HR image at a downsampled 1080p. This is only an
-                  APPARENT rescaling of 2x.
-                  If you want to reduce HR resolution by a different extent, modify accordingly.
     """
     # Load image, downsample to obtain low-res version
     hr_img = Image.open(img, mode="r")
     hr_img = hr_img.convert('RGB')
     
-    if halve:
-        hr_img = hr_img.resize((int(hr_img.width / 2), int(hr_img.height / 2)),
-                               Image.LANCZOS)
-        
     lr_img = hr_img.resize((int(hr_img.width / 4), int(hr_img.height / 4)),
                            Image.BICUBIC)
-
+    
+    print("Size lr: ", lr_img.size)
+    print("Size hr: ", hr_img.size)
     # Bicubic Upsampling
     bicubic_img = lr_img.resize((hr_img.width, hr_img.height), Image.BICUBIC)
 
@@ -53,10 +48,12 @@ def visualize_sr(img, halve=False):
     sr_img_srresnet = convert_image(sr_img_srresnet, source='[-1, 1]', target='pil')
 
     # Super-resolution (SR) with SRGAN
+    start = time.time()
     sr_img_srgan = srgan_generator(convert_image(lr_img, source='pil', target='imagenet-norm').unsqueeze(0).to(device))
     sr_img_srgan = sr_img_srgan.squeeze(0).cpu().detach()
     sr_img_srgan = convert_image(sr_img_srgan, source='[-1, 1]', target='pil')
-
+    end = time.time() - start
+    print("== Time for single image: ", end)
     # Create grid
     margin = 40
     grid_img = Image.new('RGB', (2 * hr_img.width + 3 * margin, 2 * hr_img.height + 3 * margin), (255, 255, 255))
@@ -107,4 +104,4 @@ def visualize_sr(img, halve=False):
 
 if __name__ == '__main__':
     torch.cuda.empty_cache()
-    grid_img = visualize_sr("./media/11.bmp")
+    grid_img = visualize_sr("./media/4.jpg")

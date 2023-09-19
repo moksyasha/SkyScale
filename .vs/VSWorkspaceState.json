@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\main",
+    "\\media"
   ],
-  "SelectedNode": "\\C:\\Users\\moksyasha\\Source\\Repos\\SkyScale",
+  "SelectedNode": "\\result",
   "PreviewInSolutionExplorer": false
 }
