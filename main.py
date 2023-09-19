@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
+
 # Model checkpoints
 srgan_checkpoint = "./checkpoint_srgan.pth.tar"
 srresnet_checkpoint = "./checkpoint_srresnet.pth.tar"
@@ -15,6 +16,9 @@ srresnet.eval()
 srgan_generator = torch.load(srgan_checkpoint)['generator'].to(device)
 srgan_generator.eval()
 
+#2 073 600 = 1920 * 1080 fullhd
+#3 686 400 = 2560 * 1440 2k
+#8 294 400 = 3840 * 2160 4k
 
 def visualize_sr(img, halve=False):
     """
@@ -32,9 +36,11 @@ def visualize_sr(img, halve=False):
     # Load image, downsample to obtain low-res version
     hr_img = Image.open(img, mode="r")
     hr_img = hr_img.convert('RGB')
+    
     if halve:
         hr_img = hr_img.resize((int(hr_img.width / 2), int(hr_img.height / 2)),
                                Image.LANCZOS)
+        
     lr_img = hr_img.resize((int(hr_img.width / 4), int(hr_img.height / 4)),
                            Image.BICUBIC)
 
@@ -100,4 +106,5 @@ def visualize_sr(img, halve=False):
 
 
 if __name__ == '__main__':
-    grid_img = visualize_sr("/media/1.jpg")
+    torch.cuda.empty_cache()
+    grid_img = visualize_sr("./media/11.bmp")

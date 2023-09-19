@@ -64,7 +64,7 @@ class SubPixelConvolutionalBlock(nn.Module):
     A subpixel convolutional block, comprising convolutional, pixel-shuffle, and PReLU activation layers.
     """
 
-    def __init__(self, kernel_size=3, n_channels=64, scaling_factor=2):
+    def __init__(self, kernel_size=3, n_channels=64, scaling_factor=4):
         """
         :param kernel_size: kernel size of the convolution
         :param n_channels: number of input and output channels
@@ -193,7 +193,7 @@ class Generator(nn.Module):
     The generator in the SRGAN, as defined in the paper. Architecture identical to the SRResNet.
     """
 
-    def __init__(self, large_kernel_size=9, small_kernel_size=3, n_channels=64, n_blocks=16, scaling_factor=4):
+    def __init__(self, large_kernel_size=9, small_kernel_size=3, n_channels=64, n_blocks=16, scaling_factor=2):
         """
         :param large_kernel_size: kernel size of the first and last convolutions which transform the inputs and outputs
         :param small_kernel_size: kernel size of all convolutions in-between, i.e. those in the residual and subpixel convolutional blocks
