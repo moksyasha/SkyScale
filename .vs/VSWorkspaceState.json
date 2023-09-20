@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\main",
-    "\\media"
+    "\\media",
+    "\\results"
   ],
-  "SelectedNode": "\\result",
+  "SelectedNode": "\\results\\1.bmp",
   "PreviewInSolutionExplorer": false
 }
