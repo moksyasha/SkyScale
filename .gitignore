@@ -161,7 +161,8 @@ cython_debug/
 
 
 # datasets, models
-OwnBasicVSRT/datasets
-OwnBasicVSRT/trained_models
-results
+OwnBasicVSR/datasets
+OwnBasicVSR/trained_models
+results/BasicVSR
 sr_template
+GAN/trained_models

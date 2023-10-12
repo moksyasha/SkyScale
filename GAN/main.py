@@ -14,7 +14,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
 # Model checkpoints
-srgan_checkpoint = "GAN/checkpoint_srgan.pth.tar"
+srgan_checkpoint = "GAN/trained_models/checkpoint_srgan.pth.tar"
 
 # Load GAN model
 srgan_generator = torch.load(srgan_checkpoint)['generator'].to(device)
