@@ -65,8 +65,8 @@ def main():
     else:
         for idx in range(0, num_imgs, args.interval):
             interval = min(args.interval, num_imgs - idx)
-            imgs, imgnames = read_img_seq(imgs_list[idx:idx + interval], return_imgname=True)
-            imgs = imgs.unsqueeze(0).to(device)
+            imgs, imgnames = read_img_seq(imgs_list[idx:idx + interval], return_imgname=True) #imgs 15 3 180 320
+            imgs = imgs.unsqueeze(0).to(device) #imgs 1 15 3 180 320
             inference(imgs, imgnames, model, args.save_path)
 
     # delete ffmpeg output images

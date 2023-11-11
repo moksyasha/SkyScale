@@ -15,50 +15,46 @@
 import torch
 import torchvision
 import time
- 
-def preprocess_video_gpu(video_path, image_size_low, frames_per_cycle=30):
-   reader = torchvision.io.VideoReader(video_path, "video", num_threads=0, device="cuda")
-   resizer = torchvision.transforms.Resize(image_size_low, antialias=True)
- 
-   curr_frames = []
-   all_frames_low = []
- 
-   for frame in reader:
-       curr_frames.append(frame["data"])
- 
-       if len(curr_frames) == frames_per_cycle:
-           resize_chunk(curr_frames, all_frames_low, resizer)
-           curr_frames = []
- 
-   if len(curr_frames) > 0:
-       resize_chunk(curr_frames, all_frames_low, resizer)
- 
-   all_frames_low = torch.cat(all_frames_low, 0)
- 
-   return all_frames_low
+import numpy as np
+import cv2
 
+from torchvision.io.video_reader import _HAS_VIDEO_OPT
+from torchvision.io._load_gpu_decoder import _HAS_GPU_VIDEO_DECODER
+print(_HAS_VIDEO_OPT)
+print(_HAS_GPU_VIDEO_DECODER)
+print(torchvision.io._load_gpu_decoder.__file__)
+s = time.time()
+frames = 0
+torchvision.set_video_backend("cuda")
+video_path = "/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test1920x1080_av.mp4"
+reader = torchvision.io.VideoReader(video_path, "video")
 
-def resize_chunk(curr_frames, all_frames_low, resizer):
-   curr_frames = torch.stack(curr_frames, 0)
-   curr_frames = curr_frames.permute(0, 3, 1, 2)
-   curr_frames_low = resizer(curr_frames)
-   curr_frames_low = curr_frames_low.permute(0, 2, 3, 1)
-   all_frames_low.append(curr_frames_low)
+for frame in reader:
+    frames+=1
 
-# from torchvision.io import _HAS_VIDEO_OPT
-# print(_HAS_VIDEO_OPT)
-import distutils.spawn
-import shutil
-print(shutil.which('ffmpeg'))
-print(distutils.spawn.find_executable('ffmpeg'))
-# s = time.time()
+print("torchFrames:", frames)
+print("Preprocess on GPU time:", time.time() - s)
+end = time.time()
+print(f"{frames/(end-s):.1f} frames per second")
 
-# #torchvision.set_video_backend("video_reader")
+frames = 0
+# 123?
+cap = cv2.VideoCapture(video_path, apiPreference=cv2.CAP_FFMPEG)
+frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-# stream = "video"
-# video_path = "datasets/own/test.mp4"
-# video = torchvision.io.VideoReader(video_path, stream)
-# video.get_metadata()
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device)
+start = time.time()
+while True:
+    ret, frame = cap.read()
+    
+    if ret is False:
+        break
+    else:
+        img = torch.from_numpy(frame).float().to(device)
 
-# #print("Frames:", frames)
-# print("Preprocess on GPU time:", time.time() - s)
+end = time.time()
+print("Preprocess on GPU time:", end - start)
+print(f"{frames/(end-start):.1f} frames per second")
+
+cap.release()

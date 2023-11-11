@@ -43,10 +43,11 @@ class BasicVSR(nn.Module):
 
     def get_flow(self, x):
         b, n, c, h, w = x.size()
-
+        # 1 15 3 180 320
         x_1 = x[:, :-1, :, :, :].reshape(-1, c, h, w)
+        # 14 3 180 320
         x_2 = x[:, 1:, :, :, :].reshape(-1, c, h, w)
-
+        # 14 3 180 320
         flows_backward = self.spynet(x_1, x_2).view(b, n - 1, 2, h, w)
         flows_forward = self.spynet(x_2, x_1).view(b, n - 1, 2, h, w)
 
@@ -58,7 +59,10 @@ class BasicVSR(nn.Module):
         Args:
             x: Input frames with shape (b, n, c, h, w). n is the temporal dimension / number of frames.
         """
+        # imgs 1 15 3 180 320
         flows_forward, flows_backward = self.get_flow(x)
+        # back 1 14 2 180 320
+        # forw 1 14 2 180 320
         b, n, _, h, w = x.size()
 
         # backward branch
