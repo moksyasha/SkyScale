@@ -6,37 +6,54 @@ import os
 import shutil
 import torch
 import torchvision
+from torchvision.utils import save_image
+import time
+import subprocess
 
 from basicsr.archs.basicvsrpp_arch import BasicVSRPlusPlus
 from basicsr.archs.basicvsr_arch import BasicVSR
 from basicsr.data.data_util import read_img_seq
 from basicsr.utils.img_util import tensor2img
 
-index = 0
 
-def inference(frames, model, save_path):
+def inference(frames, model, save_path, index_img):
     with torch.no_grad():
         outputs = model(frames)
-    # save imgs
-    outputs = outputs.squeeze()
-    outputs = list(outputs)
-    for output in outputs:
-        output = tensor2img(output)
-        cv2.imwrite(os.path.join(save_path, f'{index}_BasicVSR.png'), output)
-        index = index + 1
 
+        # save upscaled images to jpg
+        outputs = outputs.squeeze()
+        for i in range(outputs.shape[0]):
+            save_image(outputs[i], os.path.join(save_path, f"{index_img:04d}_BasicVSR.jpg"))
+            index_img += 1
+            #torchvision.io.write_jpeg(outputs[i], os.path.join(save_path, f'{index_img}_BasicVSR.jpg'), 100)
+    # save imgs
+    # outputs = outputs.squeeze()
+    # outputs = list(outputs)
+    # for output in outputs:
+    #     output = tensor2img(output, True)
+        
+    #     cv2.imwrite(os.path.join(save_path, f'{index_img}_BasicVSR.jpg'), output)
+    #     index_img = index_img + 1
+    return index_img
+
+#320 180
+#1280 720 hd
+#2.073.600 = 1920 * 1080 fullhd
+#3.686.400 = 2560 * 1440 2k
+#8.294.400 = 3840 * 2160 4k (hd*3) (fhd*2) (2k*1.5)
 
 def main():
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', type=str, default='OwnBasicVSR/trained_models/BasicVSR_Vimeo90K.pth')
     parser.add_argument(
-        '--input_path', type=str, default='/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test1920x1080_av.mp4', help='input test video')
-    parser.add_argument('--save_path', type=str, default='results/BasicVSR/own/', help='save image path')
+        '--input_path', type=str, default='/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test480_270.mp4', help='input test video')
+    parser.add_argument('--save_path', type=str, default='/home/moksyasha/Projects/SkyScale/results/BasicVSR/own/temp/', help='save image path')
     parser.add_argument('--interval', type=int, default=100, help='interval size')
     args = parser.parse_args()
 
     device_cuda = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+    
     # set up model
     model = BasicVSR(num_feat=64, num_block=30)
     model.load_state_dict(torch.load(args.model_path)['params'], strict=True)
@@ -47,19 +64,46 @@ def main():
 
     torchvision.set_video_backend("cuda")
     reader = torchvision.io.VideoReader(args.input_path, "video")
+    fps = reader.get_metadata()['video']['fps']
+    print(fps)
+    test_frame = (next(reader))["data"]#.permute(0,1,2).cpu().numpy() # 3 1080 1920 // 15 such frames = 100 mb
 
-    test_frame = (next(reader))["data"] #.permute(2,0,1) # 3 1080 1920 // 15 such frames = 100 mb
-    print(test_frame.shape[0])
-    frames_per_cycle = 5
-    curr_frames = torch.empty((frames_per_cycle, test_frame.shape[0], test_frame.shape[1], test_frame.shape[2]), dtype=torch.float32, device=device_cuda)
-    for i in range(frames_per_cycle):
-        curr_frames[i] = (next(reader))["data"]
-    curr_frames = curr_frames.unsqueeze(0).permute(0, 1, 4, 2, 3)
-    pass
-    #print(curr_frames.unsqueeze(0).permute(0, 1, 4, 2, 3).shape) # torch.Size([1, 15, 3, 1080, 1920])
-    inference(curr_frames, model, args.save_path)
-    
+    frames_per_cycle = 20
+    index_img = 0
+    start = time.time()
+
+    while True:
+        torch.cuda.empty_cache()
+        try:
+            frames = 0
+            curr_frames = torch.empty((frames_per_cycle, test_frame.shape[0], test_frame.shape[1], test_frame.shape[2]), dtype=torch.float32, device=device_cuda)
+            for i in range(frames_per_cycle):
+                curr_frames[i] = (next(reader))["data"] / 255.
+                frames += 1
+        except:
+            if frames:
+                curr_frames = curr_frames[:frames].unsqueeze(0).permute(0, 1, 4, 2, 3)
+                index_img = inference(curr_frames, model, args.save_path, index_img)
+            break
+        else:
+            curr_frames = curr_frames.unsqueeze(0).permute(0, 1, 4, 2, 3)
+            index_img = inference(curr_frames, model, args.save_path, index_img)
+        print(f"{index_img} frames upscaled")
+
+    end = time.time() - start
+    print("== Time for single video: ", end)
+    os.chdir(args.save_path)
+    os.system('ffmpeg -r 24 -pattern_type glob -i "*.jpg" -c:v libx264 -movflags +faststart ../output.mp4')
+    os.system('cd .. && rm -rf ./temp')
+    # cmd2 = ['ffmpeg', '-r', '24', '-pattern_type', 'glob', '-i', '"*.jpg"', '-c:v', 'libx264', '-movflags', '+faststart', '../output.mp4']
+    # retcode = subprocess.call(cmd2)
+    # if not retcode == 0: #or not retcode2 == 0:
+    #     raise ValueError('Error {} executing command: {}'.format(retcode, ' '.join(cmd2)))
+    # else:
+    print("Upscale completed")  
+
 
 
 if __name__ == '__main__':
     main()
+    #ff()

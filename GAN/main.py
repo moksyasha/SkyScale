@@ -19,11 +19,12 @@ srgan_checkpoint = "GAN/trained_models/checkpoint_srgan.pth.tar"
 # Load GAN model
 srgan_generator = torch.load(srgan_checkpoint)['generator'].to(device)
 srgan_generator.eval()
+
 #320 180
 #1280 720
-#2 073 600 = 1920 * 1080 fullhd
-#3 686 400 = 2560 * 1440 2k
-#8 294 400 = 3840 * 2160 4k
+#2ï¿½073ï¿½600 = 1920 * 1080 fullhd
+#3ï¿½686ï¿½400 = 2560 * 1440 2k
+#8ï¿½294ï¿½400 = 3840 * 2160 4k
 
 def visualize_sr(img):
     """
