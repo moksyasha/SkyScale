@@ -1,0 +1,7 @@
+Collecting sk-video
+  Downloading sk_video-1.1.10-py2.py3-none-any.whl (2.3 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.3/2.3 MB 4.1 MB/s eta 0:00:00
+Requirement already satisfied: numpy in /home/moksyasha/miniconda3/envs/env/lib/python3.11/site-packages (from sk-video) (1.26.0)
+Requirement already satisfied: scipy in /home/moksyasha/miniconda3/envs/env/lib/python3.11/site-packages (from sk-video) (1.11.3)
+Installing collected packages: sk-video
+Successfully installed sk-video-1.1.10

@@ -166,3 +166,4 @@ OwnBasicVSR/trained_models
 results/BasicVSR
 sr_template
 GAN/trained_models
+RIFE/datasets
