@@ -37,7 +37,7 @@ def visualize_sr(img):
     hr_img = Image.open(img, mode="r")
     hr_img = hr_img.convert('RGB')
     
-    lr_img = hr_img.resize((int(hr_img.width / 4), int(hr_img.height / 4)),
+    lr_img = hr_img.resize((int(hr_img.width / 6), int(hr_img.height / 6)),
                            Image.BICUBIC)
     
     print("Size lr: ", lr_img.size)
@@ -95,4 +95,4 @@ def visualize_sr(img):
 
 if __name__ == '__main__':
     torch.cuda.empty_cache()
-    grid_img = visualize_sr("GAN/media/4.jpg")
+    grid_img = visualize_sr("GAN/media/2.jpg")
