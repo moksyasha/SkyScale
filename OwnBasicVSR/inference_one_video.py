@@ -9,6 +9,7 @@ import torchvision
 from torchvision.utils import save_image
 import time
 import subprocess
+import nvtx
 
 from basicsr.archs.basicvsrpp_arch import BasicVSRPlusPlus
 from basicsr.archs.basicvsr_arch import BasicVSR
@@ -16,6 +17,7 @@ from basicsr.data.data_util import read_img_seq
 from basicsr.utils.img_util import tensor2img
 
 
+@nvtx.annotate("inference", color="green")
 def inference(frames, model, save_path, index_img):
     with torch.no_grad():
         outputs = model(frames)
@@ -41,11 +43,14 @@ def inference(frames, model, save_path, index_img):
 #2.073.600 = 1920 * 1080 fullhd
 #3.686.400 = 2560 * 1440 2k
 #8.294.400 = 3840 * 2160 4k (hd*3) (fhd*2) (2k*1.5)
+#                           (hd*9) (fhd*4) (2k*2.25)
+#/usr/local/cuda-12.3/nsight-systems-2023.3.3/bin/nsys profile -t nvtx,osrt --force-overwrite=true --stats=true --output=quickstart python ../inference_one_video.py
 
+@nvtx.annotate("main", color="purple")
 def main():
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model_path', type=str, default='OwnBasicVSR/trained_models/BasicVSR_Vimeo90K.pth')
+    parser.add_argument('--model_path', type=str, default='/home/moksyasha/Projects/SkyScale/OwnBasicVSR/trained_models/BasicVSR_Vimeo90K.pth')
     parser.add_argument(
         '--input_path', type=str, default='/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test480_270.mp4', help='input test video')
     parser.add_argument('--save_path', type=str, default='/home/moksyasha/Projects/SkyScale/results/BasicVSR/own/temp/', help='save image path')
@@ -65,7 +70,7 @@ def main():
     torchvision.set_video_backend("cuda")
     reader = torchvision.io.VideoReader(args.input_path, "video")
     fps = reader.get_metadata()['video']['fps']
-    print(fps)
+
     test_frame = (next(reader))["data"]#.permute(0,1,2).cpu().numpy() # 3 1080 1920 // 15 such frames = 100 mb
 
     frames_per_cycle = 20
