@@ -10,9 +10,9 @@ from torch.profiler import profile, record_function, ProfilerActivity
 
 @nvtx.annotate("opencv", color="purple")
 def main():
-    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test2560x1440_24_5sec.mp4' #2k
-    video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1920x1080_24_5sec.mp4' #fhd
-    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1280x720_24_5sec.mp4' #hd
+    video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test2560x1440_24_15sec.mp4' #2k
+    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1920x1080_24_15sec.mp4' #fhd
+    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1280x720_24_15sec.mp4' #hd
     # video_path = '/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test480_270.mp4'
     # Открываем видеофайл
     cap = cv2.VideoCapture(video_path)
@@ -64,9 +64,9 @@ from torchvision.transforms import v2
 @nvtx.annotate("cuda", color="green")
 def main_cuda():
     torch.cuda.cudart().cudaProfilerStart()
-    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test2560x1440_24_5sec.mp4' #2k
-    video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1920x1080_24_5sec.mp4' #fhd
-    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1280x720_24_5sec.mp4' #hd
+    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test2560x1440_24_15sec.mp4' #2k
+    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1920x1080_24_15sec.mp4' #fhd
+    video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1280x720_24_15sec.mp4' #hd
 
     start_time = time.time()
     frame_count = 0
@@ -100,9 +100,9 @@ def main_cuda():
 @nvtx.annotate("io", color="yellow")
 def main_io():
 
-    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test2560x1440_24_5sec.mp4' #2k
-    video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1920x1080_24_5sec.mp4' #fhd
-    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1280x720_24_5sec.mp4' #hd
+    video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test2560x1440_24_15sec.mp4' #2k
+    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1920x1080_24_15sec.mp4' #fhd
+    #video_path = '/home/moksyasha/Projects/SkyScale/decoding_testing/test1280x720_24_15sec.mp4' #hd
     # video_path = '/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test480_270.mp4'
 
     frame_count = 0

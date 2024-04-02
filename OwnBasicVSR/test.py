@@ -23,38 +23,38 @@ from torchvision.io._load_gpu_decoder import _HAS_GPU_VIDEO_DECODER
 print(_HAS_VIDEO_OPT)
 print(_HAS_GPU_VIDEO_DECODER)
 print(torchvision.io._load_gpu_decoder.__file__)
-s = time.time()
-frames = 0
-torchvision.set_video_backend("cuda")
-video_path = "/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test1920x1080_av.mp4"
-reader = torchvision.io.VideoReader(video_path, "video")
+# s = time.time()
+# frames = 0
+# torchvision.set_video_backend("cuda")
+# video_path = "/home/moksyasha/Projects/SkyScale/OwnBasicVSR/datasets/own/test1920x1080_av.mp4"
+# reader = torchvision.io.VideoReader(video_path, "video")
 
-for frame in reader:
-    frames+=1
+# for frame in reader:
+#     frames+=1
 
-print("torchFrames:", frames)
-print("Preprocess on GPU time:", time.time() - s)
-end = time.time()
-print(f"{frames/(end-s):.1f} frames per second")
+# print("torchFrames:", frames)
+# print("Preprocess on GPU time:", time.time() - s)
+# end = time.time()
+# print(f"{frames/(end-s):.1f} frames per second")
 
-frames = 0
-# 123?
-cap = cv2.VideoCapture(video_path, apiPreference=cv2.CAP_FFMPEG)
-frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+# frames = 0
+# # 123?
+# cap = cv2.VideoCapture(video_path, apiPreference=cv2.CAP_FFMPEG)
+# frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print(device)
-start = time.time()
-while True:
-    ret, frame = cap.read()
+# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# print(device)
+# start = time.time()
+# while True:
+#     ret, frame = cap.read()
     
-    if ret is False:
-        break
-    else:
-        img = torch.from_numpy(frame).float().to(device)
+#     if ret is False:
+#         break
+#     else:
+#         img = torch.from_numpy(frame).float().to(device)
 
-end = time.time()
-print("Preprocess on GPU time:", end - start)
-print(f"{frames/(end-start):.1f} frames per second")
+# end = time.time()
+# print("Preprocess on GPU time:", end - start)
+# print(f"{frames/(end-start):.1f} frames per second")
 
-cap.release()
+# cap.release()

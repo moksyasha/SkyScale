@@ -69,23 +69,23 @@ def visualize_sr(img):
 
     # Place bicubic-upsampled image
     grid_img.paste(bicubic_img, (margin, margin))
-    text_size = font.getsize("Bicubic")
-    draw.text(xy=[margin + bicubic_img.width / 2 - text_size[0] / 2, margin - text_size[1] - 5], text="Bicubic",
-              font=font,
-              fill='black')
+    # text_size = font.getsize("Bicubic")
+    # draw.text(xy=[margin + bicubic_img.width / 2 - text_size[0] / 2, margin - text_size[1] - 5], text="Bicubic",
+    #           font=font,
+    #           fill='black')
 
     # Place SRGAN image
     grid_img.paste(sr_img_srgan, (2 * margin + bicubic_img.width, margin))
-    text_size = font.getsize("SRGAN")
-    draw.text(
-        xy=[margin + bicubic_img.width / 2 - text_size[0] / 2, 2 * margin + bicubic_img.height - text_size[1] - 5],
-        text="SRGAN", font=font, fill='black')
+    # text_size = font.getsize("SRGAN")
+    # draw.text(
+    #     xy=[margin + bicubic_img.width / 2 - text_size[0] / 2, 2 * margin + bicubic_img.height - text_size[1] - 5],
+    #     text="SRGAN", font=font, fill='black')
 
     # Place original HR image
     grid_img.paste(hr_img, (2 * margin + bicubic_img.width, 2 * margin + bicubic_img.height))
-    text_size = font.getsize("Original HR")
-    draw.text(xy=[2 * margin + bicubic_img.width + bicubic_img.width / 2 - text_size[0] / 2,
-                  2 * margin + bicubic_img.height - text_size[1] - 1], text="Original HR", font=font, fill='black')
+    # text_size = font.getsize("Original HR")
+    # draw.text(xy=[2 * margin + bicubic_img.width + bicubic_img.width / 2 - text_size[0] / 2,
+    #               2 * margin + bicubic_img.height - text_size[1] - 1], text="Original HR", font=font, fill='black')
 
     # Display grid
     grid_img.show()

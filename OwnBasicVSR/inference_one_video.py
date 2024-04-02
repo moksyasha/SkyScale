@@ -20,8 +20,10 @@ from basicsr.utils.img_util import tensor2img
 @nvtx.annotate("inference", color="green")
 def inference(frames, model, save_path, index_img):
     with torch.no_grad():
+        start = time.time()
         outputs = model(frames)
-
+        end = time.time() - start
+        print("== Time for 5: ", end)
         # save upscaled images to jpg
         outputs = outputs.squeeze()
         for i in range(outputs.shape[0]):
@@ -66,14 +68,14 @@ def main():
     model = model.to(device_cuda)
 
     os.makedirs(args.save_path, exist_ok=True)
-
+    
     torchvision.set_video_backend("cuda")
     reader = torchvision.io.VideoReader(args.input_path, "video")
     fps = reader.get_metadata()['video']['fps']
 
     test_frame = (next(reader))["data"]#.permute(0,1,2).cpu().numpy() # 3 1080 1920 // 15 such frames = 100 mb
 
-    frames_per_cycle = 20
+    frames_per_cycle = 10
     index_img = 0
     start = time.time()
 
