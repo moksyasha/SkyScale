@@ -77,7 +77,6 @@ class BasicVSRPlusPlusNet(BaseModule):
                 2 * mid_channels,
                 mid_channels,
                 3,
-                padding=1,
                 deform_groups=16,
                 max_residue_magnitude=max_residue_magnitude)
             self.backbone[module] = ResidualBlocksWithInputConv(
@@ -355,7 +354,12 @@ class BasicVSRPlusPlusNet(BaseModule):
 
 class SecondOrderDeformableAlignment(ModulatedDeformConv2d):
     """Second-order deformable alignment module.
-
+     2 * self.mid_channels,
+                self.mid_channels,
+                3,
+                padding=1,
+                deform_groups=16,
+                max_residue_magnitude=self.max_residue_magnitude)
     Args:
         in_channels (int): Same as nn.Conv2d.
         out_channels (int): Same as nn.Conv2d.

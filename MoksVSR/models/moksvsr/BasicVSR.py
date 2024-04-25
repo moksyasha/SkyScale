@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import time
 
 class SPyNet(nn.Module):
     def __init__(self):
@@ -142,15 +143,17 @@ class Generator(nn.Module):
         N, T, C, H, W = x.shape
         x_start = x[:, :-1, :, :, :].reshape(-1, C, H, W) # reshape from (N, T, C, H, W) into (N*T, C, H, W)
         x_end = x[:, 1:, :, :, :].reshape(-1, C, H, W)
+        
         forward_flows = self.spynet(x_start, x_end).view(N, T-1, 2, H, W)
         backward_flows = self.spynet(x_end, x_start).view(N, T-1, 2, H, W)
-        
+
         return forward_flows, backward_flows
     
     def forward(self, x):
         N, T, C, H, W = x.shape
+
         forward_flows, backward_flows = self.compute_flows(x) # flow estimation (S step)
-        
+
         # backward propagation
         features = x.new_zeros((N, self.nc, H, W)) # initialize features as zeros with same dtype and device as x
         outputs = []
