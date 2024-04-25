@@ -1,7 +1,6 @@
 import os, glob, multiprocessing, torch
 from torch.utils.data import DataLoader
-from models.moksvsr.MoksVSR import MoksVSR, MoksPlus, TestMoksVSRDouble
-from models.moksvsr.BasicVSR import Generator
+from models.moksvsr.MoksVSR import MoksVSR, MoksPlus
 from dataset import VidDataset, RedsDataset
 import argparse
 from tqdm import tqdm
