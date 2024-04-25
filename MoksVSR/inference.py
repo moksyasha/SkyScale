@@ -38,6 +38,7 @@ def main():
     #ds_test = VidDataset('/media/moksyasha/linux_data/datasets/Vid4', 20)
     #dataloader_val = DataLoader(ds_test, batch_size=BATCH_SIZE, shuffle=False, num_workers=N_CORES)
 
+    # own model
     model = MoksPlus()
     #model_2 = Generator()
     checkpoint = torch.load(args.checkpoint)
