@@ -1,7 +1,6 @@
 import os, glob, multiprocessing, torch
 from torch.utils.data import DataLoader
-from models.moksvsr.MoksVSR import MoksVSR, MoksPlus, TestMoksVSRDouble
-from models.moksvsr.BasicVSR import Generator
+from models.moksvsr.MoksVSR import MoksVSR, MoksPlus
 from dataset import VidDataset
 import argparse
 from tqdm import tqdm
@@ -15,7 +14,7 @@ import torchvision.transforms as T
 def parse_args():
     parser = argparse.ArgumentParser(description='Test (and eval) a model')
     parser.add_argument('--config', default="/home/moksyasha/Projects/SkyScale/MoksVSR/config/configs/basicvsr/6464crop_moks__28.py", help='test config file path')
-    parser.add_argument('--checkpoint', default="/home/moksyasha/Projects/SkyScale/MoksVSR/checkpoints/plus_resize64_29.pt", help='checkpoint file')
+    parser.add_argument('--checkpoint', default="/home/moksyasha/Projects/SkyScale/MoksVSR/checkpoints/moks_resize64x64_29.pt", help='checkpoint file')
     parser.add_argument('--out', help='the file to save metric results.')
     parser.add_argument(
         '--work-dir',
@@ -38,7 +37,7 @@ def main():
     ds_test = VidDataset('/media/moksyasha/linux_data/datasets/Vid4', 10)
     dataloader_val = DataLoader(ds_test, batch_size=BATCH_SIZE, shuffle=False, num_workers=N_CORES)
 
-    model = MoksPlus()
+    model = MoksVSR()
     #model_2 = Generator()
     checkpoint = torch.load(args.checkpoint)
     model.load_state_dict(checkpoint['model_state_dict'])
@@ -110,8 +109,9 @@ def main():
                 hr_trans = hr_trans.squeeze().permute(0, 2, 3, 1).cpu().numpy()
                 hr = hr.squeeze().permute(0, 2, 3, 1).cpu().numpy()
                 for i, pred in enumerate(y_pred):
-                    cv2.imwrite('/home/moksyasha/Projects/SkyScale/MoksVSR/results/vid_plus_hr/{:06d}.png'.format(num), cv2.cvtColor(255*hr[i], cv2.COLOR_BGR2RGB))
-                    cv2.imwrite('/home/moksyasha/Projects/SkyScale/MoksVSR/results/vid_plus_pred/{:06d}.png'.format(num), cv2.cvtColor(255*pred, cv2.COLOR_BGR2RGB))
+                    #cv2.imwrite('/home/moksyasha/Projects/SkyScale/MoksVSR/results/vid_plus_hr/{:06d}.png'.format(num), cv2.cvtColor(255*hr[i], cv2.COLOR_BGR2RGB))
+                    #cv2.imwrite('/home/moksyasha/Projects/SkyScale/MoksVSR/results/vid_plus_lr/{:06d}.png'.format(num), cv2.cvtColor(255*hr_trans[i], cv2.COLOR_BGR2RGB))
+                    cv2.imwrite('/home/moksyasha/Projects/SkyScale/MoksVSR/results/vid_basic_pred/{:06d}.png'.format(num), cv2.cvtColor(255*pred, cv2.COLOR_BGR2RGB))
                     num += 1
             
 

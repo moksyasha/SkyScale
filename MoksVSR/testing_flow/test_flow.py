@@ -16,7 +16,7 @@ import time
 
 import sys
 sys.path.append(os.path.abspath("/home/moksyasha/Projects/SkyScale/MoksVSR/"))
-from SpyNetflow import SPyNet
+#from SpyNetflow import SPyNet
 
 from modelsflow.FastFlowNet_v2 import FastFlowNet
 from flow_vis import flow_to_color
@@ -212,7 +212,7 @@ def main():
     # EPOCHS = 40
     # SHOW_PREDS_EVERY = 10 # every 10 epochs, display the model predictions
     # N_CORES = multiprocessing.cpu_count()
-    # device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     # ds_path = '/media/moksyasha/linux_data/datasets/REDS4/train_sharp'
     # ds = VSRDataset(ds_path)
@@ -238,80 +238,77 @@ def main():
     import torchvision.transforms as transforms
     resize = transforms.Resize(input_size)
     img1 = resize(img1)
-    # imgplot = plt.imshow(flow_bgr_npy)
-    # plt.show()
     img2 = resize(img2)
     # img1 = F.resize(img1, size=input_size, mode='bilinear', align_corners=False)
     # img2 = F.resize(img2, size=input_size, mode='bilinear', align_corners=False)
-    imgplot = plt.imshow(img1.squeeze().permute(1, 2, 0).numpy())
+    imgplot = plt.imshow(img2.squeeze().permute(1, 2, 0).numpy())
     plt.show()
-    print("inter:" , img1.shape)
-    img3 = torch.clone(img1)
-    img4 = torch.clone(img1)
-    images = torch.cat((img1, img2, img3, img4), 0).unsqueeze(0)
+
+    images = torch.cat((img1, img2), 0).unsqueeze(0).float().cuda().to(device)
     print("iamges:" , images.shape)
     #########################################33
-    flow_model = SPyNet(None)
-    start = time.time()
+    # flow_model = SPyNet(None)
+    # start = time.time()
 
-    a = []
-    for i in range(100):
-        flow = flow_model(torch.tensor(lr_img1).permute(2, 0, 1).unsqueeze(0)/255., torch.tensor(lr_img2).permute(2, 0, 1).unsqueeze(0)/255.).squeeze().permute(1, 2, 0).detach().numpy()
-        end = time.time()
-        print("The time of execution:",
-            (end-start) * 10**3, "ms")
-        start = end
-    #print(flow.shape)
+    # a = []
+    # for i in range(100):
+    #     flow = flow_model(torch.tensor(lr_img1).permute(2, 0, 1).unsqueeze(0)/255., torch.tensor(lr_img2).permute(2, 0, 1).unsqueeze(0)/255.).squeeze().permute(1, 2, 0).detach().numpy()
+    #     end = time.time()
+    #     print("The time of execution:",
+    #         (end-start) * 10**3, "ms")
+    #     start = end
+    # #print(flow.shape)
 
 
-    image = flow_to_color(flow, True)
-    print("Image: ", image.shape)
+    # image = flow_to_color(flow, True)
+    # print("Image: ", image.shape)
    
-    imgplot = plt.imshow(image)
-    plt.show()
+    # imgplot = plt.imshow(image)
+    # plt.show()
     #########################################33
 
-    # import cv2 as cv
-    # import ptlflow
-    # from ptlflow.utils import flow_utils
-    # from ptlflow.utils.io_adapter import IOAdapter
+    import cv2 as cv
+    import ptlflow
+    from ptlflow.utils import flow_utils
+    from ptlflow.utils.io_adapter import IOAdapter
 
-    # model = ptlflow.get_model('fastflownet', pretrained_ckpt='sintel')
-    # # A helper to manage inputs and outputs of the model
-    # # io_adapter = IOAdapter(model, images[0].shape[:2])
+    model = ptlflow.get_model('rpknet', pretrained_ckpt='sintel')
+    model = model.to(device)
+    # A helper to manage inputs and outputs of the model
+    # io_adapter = IOAdapter(model, images[0].shape[:2])
 
-    # # inputs is a dict {'images': torch.Tensor}
-    # # The tensor is 5D with a shape BNCHW. In this case, it will have the shape:
-    # # (1, 2, 3, H, W)
-    # #inputs = io_adapter.prepare_inputs(images)
-    # predictions = model({"images": images})
-    # # Forward the inputs through the model
-    # start = time.time()
-    # predictions = model({"images": images})
-    # end = time.time()
-    # print("The time of execution:",
-    #     (end-start) * 10**3, "ms")
-    # # The output is a dict with possibly several keys,
-    # # but it should always store the optical flow prediction in a key called 'flows'.
-    # flows = predictions['flows']
+    # inputs is a dict {'images': torch.Tensor}
+    # The tensor is 5D with a shape BNCHW. In this case, it will have the shape:
+    # (1, 2, 3, H, W)
+    #inputs = io_adapter.prepare_inputs(images)
+    predictions = model({"images": images})
+    # Forward the inputs through the model
+    start = time.time()
+    predictions = model({"images": images})
+    end = time.time()
+    print("The time of execution:",
+        (end-start) * 10**3, "ms")
+    # The output is a dict with possibly several keys,
+    # but it should always store the optical flow prediction in a key called 'flows'.
+    flows = predictions['flows']
 
-    # # flows will be a 5D tensor BNCHW.
-    # # This example should print a shape (1, 1, 2, H, W).
-    # print(flows.shape)
+    # flows will be a 5D tensor BNCHW.
+    # This example should print a shape (1, 1, 2, H, W).
+    print(flows.shape)
 
-    # # Create an RGB representation of the flow to show it on the screen
-    # flow_rgb = flow_utils.flow_to_rgb(flows)
-    # # Make it a numpy array with HWC shape
-    # flow_rgb = flow_rgb[0, 0].permute(1, 2, 0)
-    # flow_rgb_npy = flow_rgb.detach().cpu().numpy()
-    # # OpenCV uses BGR format
-    # flow_bgr_npy = cv.cvtColor(flow_rgb_npy, cv.COLOR_RGB2BGR)
+    # Create an RGB representation of the flow to show it on the screen
+    flow_rgb = flow_utils.flow_to_rgb(flows)
+    # Make it a numpy array with HWC shape
+    flow_rgb = flow_rgb[0, 0].permute(1, 2, 0)
+    flow_rgb_npy = flow_rgb.detach().cpu().numpy()
+    # OpenCV uses BGR format
+    flow_bgr_npy = cv.cvtColor(flow_rgb_npy, cv.COLOR_RGB2BGR)
 
-    # #flow_bgr_npy = F.interpolate(flow_bgr_npy, size=orig_size, mode='bilinear', align_corners=False)
+    #flow_bgr_npy = F.interpolate(flow_bgr_npy, size=orig_size, mode='bilinear', align_corners=False)
     
 
-    # imgplot = plt.imshow(flow_bgr_npy)
-    # plt.show()
+    imgplot = plt.imshow(flow_bgr_npy)
+    plt.show()
 
 
 
