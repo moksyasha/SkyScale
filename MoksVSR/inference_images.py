@@ -46,35 +46,38 @@ def main():
     #epoch = checkpoint['epoch']
     model = model.to(device)
 
-    #model.eval()  # handle drop-out/batch norm layers
-    torch.cuda.empty_cache()
-    lr, hr = ds_test[0]
-    lr_gpu, hr_gpu = torch.from_numpy(lr).float() / 255., torch.from_numpy(hr).float() / 255.
-    lr_gpu = lr_gpu.permute(0, 3, 1, 2)
-    transform1 = T.Resize((128, 128))
-    #lr_gpu = transform1(lr_gpu)
-    lr_gpu = lr_gpu.to(device)
+    model.eval()  # handle drop-out/batch norm layers
+    # torch.cuda.empty_cache()
+    # lr, hr = ds_test[0]
+    # lr_gpu, hr_gpu = torch.from_numpy(lr).float() / 255., torch.from_numpy(hr).float() / 255.
+    # lr_gpu = lr_gpu.permute(0, 3, 1, 2)
+    # transform1 = T.Resize((128, 128))
+    # #lr_gpu = transform1(lr_gpu)
+    # lr_gpu = lr_gpu.to(device)
     #y_pred = model(lr_gpu.unsqueeze(0).permute(0, 1, 4, 2, 3))
     
     ## test 2 images
     img1_path = "/media/moksyasha/linux_data/01.png"
     img2_path = "/media/moksyasha/linux_data/02.png"
-    img1 = torch.tensor(cv2.imread(img1_path)).float().unsqueeze(0)/255.0
-    img2 = torch.tensor(cv2.imread(img2_path)).float().unsqueeze(0)/255.0
-    transform2 = T.Resize((img1.shape[1]//3, img1.shape[2]//3))
+    img1 = torch.tensor(cv2.cvtColor(cv2.imread(img1_path), cv2.COLOR_BGR2RGB)).float().unsqueeze(0)/255.0
+    img2 = torch.tensor(cv2.cvtColor(cv2.imread(img2_path), cv2.COLOR_BGR2RGB)).float().unsqueeze(0)/255.0
+    transform2 = T.Resize((img1.shape[1]//4, img1.shape[2]//4))
     imgss = torch.cat((img1, img2), dim=0).permute(0, 3, 1, 2)
     imgss = transform2(imgss)
     imgss = imgss.to(device)
     ##
     start = time.time()
-    y_pred = model(imgss.unsqueeze(0)).squeeze().permute(0, 2, 3, 1).detach().cpu().numpy()
+    y_pred1 = model(imgss.unsqueeze(0)).squeeze().permute(0, 2, 3, 1).detach().cpu().numpy()
+    print(y_pred1.shape)
     end = time.time()
     print("The time of execution:",
         (end-start) * 10**3, "ms")
     fig, ax = plt.subplots(1, 3)
-    ax[0].imshow(lr[0])
-    ax[1].imshow(y_pred[0])
-    ax[2].imshow(hr[0])
+    a_cpu = imgss[0].permute(1, 2, 0).detach().cpu().numpy()
+
+    ax[0].imshow(a_cpu)
+    ax[1].imshow(y_pred1[0])
+    ax[2].imshow(img2.squeeze())
     fig.set_figwidth(10)
     fig.set_figheight(10)
     plt.show()

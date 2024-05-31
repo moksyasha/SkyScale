@@ -1,7 +1,7 @@
 # SkyScale
-Project to improve video stream based on neural networks (Super-Resolution and GANs)
+Project to improve video stream based on neural networks (Video Super-Resolution with RNN)
 
-![Image alt](https://github.com/moksyasha/SkyScale/blob/main/GAN/results/3.bmp)
+![Image alt](https://github.com/moksyasha/SkyScale/blob/main/result.jpg)
 
 
 # SkyScale
@@ -19,7 +19,4 @@ AI powered video-upscaler
 
 ## Предлагаемое решение
 
-Веб-сервис для улучшения видео с обучаемыми моделями (GAN, SRResNet). Предлагается разработать инструмент с
-понятным для обычного пользователя интерфейсом и набором функций, который будет получать исходный видеопоток
-и преобразовывать в новый, в зависимости от желаний пользователя. Обучение будет происходить на базе датасетов
-с изображениями в высоком качестве.
+Пользовательское приложение на базе PyQT6 с набором различных нейронных моделей. Включает в себя как рекуррентные сети (BasicVSR++), так и трансформер (VRT). Также встроена собственная сеть, превосходящая BasicVSR по метрикам PSNR, SSIM, ERQA. Собяственная сеть написана в рекуррентном стиле с ипользованием оптического потока и деформируемых сверток, среднее время обработки кадра до FullHD разрешения - 30 мс.
