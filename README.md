@@ -2,7 +2,7 @@
 Project to improve video stream based on neural networks (Video Super-Resolution with RNN)
 
 ![Image alt](https://github.com/moksyasha/SkyScale/blob/main/result.jpg)
-
+![Image alt](https://github.com/moksyasha/SkyScale/blob/main/scheme.jpg)
 
 # SkyScale
 AI powered video-upscaler
